@@ -14,7 +14,7 @@ module Telegem
         @logger = options[:logger] || Logger.new($stdout)
         timeout = options[:timeout] || 30
         
-        @http = HTTPX.with(
+        @http = HTTPX.plugins(:callbacks).with(
           timeout: { 
             request_timeout: timeout,
             connect_timeout: 10,
