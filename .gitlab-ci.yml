@@ -1,20 +1,19 @@
-# .gitlab-ci.yml
-image: alpine:latest
+# This file is a template, and might need editing before it works on your project.
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/development/cicd/templates/
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/HTML.gitlab-ci.yml
 
-stages:
-  - deploy
+# Full project: https://gitlab.com/pages/plain-html
+image: busybox
 
 pages:
   stage: deploy
-  before_script:
-    - apk add --no-cache bash
+  environment: production
   script:
-    # Make the script executable
-    - chmod +x script.ydx
-    # Run your converter script
-    - ./script.ydx docs-src public
+    - echo "The site will be deployed to $CI_PAGES_URL"
   artifacts:
     paths:
       - public
-  only:
-    - main  # Runs only on main branch
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
