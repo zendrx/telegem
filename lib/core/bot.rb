@@ -152,9 +152,9 @@ module Telegem
           # Success
           if updates_array && updates_array.is_a?(Array)
             result = { 'ok' => true, 'result' => updates_array }
-            completion_callback.call(result) if completion_callback
+            completion_callback.call(result, nil) if completion_callback
           else
-            completion_callback.call(nil) if completion_callback
+            completion_callback.call(nil, nil) if completion_callback
           end
          end 
        end
