@@ -14,7 +14,7 @@ module Telegem
         @logger = options[:logger] || Logger.new($stdout)
         timeout = options[:timeout] || 30
         
-        @http = HTTPX.plugins(:callbacks).with(
+        @http = HTTPX.plugin(:callbacks).with(
           timeout: { 
             request_timeout: timeout,
             connect_timeout: 10,
@@ -33,13 +33,9 @@ module Telegem
         @http.post(url, json: params.compact).wait  
       end
         def call!(method, params = {}, &callback)
-  url = "#{BASE_URL}/bot#{@token}/#{method}"
-  
-  # Ensure we have callbacks plugin
-  http_client = @http.plugin(:callbacks) unless @http.plugins.include?(:callbacks)
-  
-  # Make the request
-  request = http_client.post(url, json: params.compact)
+         url = "#{BASE_URL}/bot#{@token}/#{method}"
+           @http
+  request = @http.post(url, json: params.compact)
   
   # Set up response handler
   request.on_response_completed do |response|
