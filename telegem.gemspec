@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   
   # Dependencies
-  spec.add_dependency "httpx", "~> 0.20"
+  spec.add_dependency "httpx", "~> 1.7.0"
   spec.add_dependency "concurrent-ruby", "~> 1.2"
   spec.add_dependency "rack", ">= 2.0", "< 4.0"
   spec.add_dependency "puma", ">= 5.0", "< 7.0"
