@@ -78,6 +78,6 @@ end
 # Optional global shortcut (enabled by env var)
 if ENV['TELEGEM_GLOBAL'] == 'true'
   def Telegem(token, **options)
-    Telegem.new(token, **options)
+    ::Telegem.new(token, **options)
   end
 end
