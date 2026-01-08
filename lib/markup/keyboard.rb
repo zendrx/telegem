@@ -154,7 +154,9 @@ module Telegem
       def to_h
         {
           inline_keyboard: @buttons.map { |row| row.is_a?(Array) ? row : [row] }
+        }.reject(&:empty?).map { |row| row.map { |btn| btn.is_a?(Hash) ? btn : btn.to_h} 
         }
+       } 
       end
 
       def to_json(*args)
