@@ -232,7 +232,7 @@ module Telegem
         elsif buttons.any?
           @keyboard.row(*buttons)
         else
-          @keyboard.row
+          @keyboard.row([]) 
         end
         self
       end
