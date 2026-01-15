@@ -3,7 +3,6 @@ image: ruby:3.3
 stages:
   - test
   - build
-  - deploy
 
 variables:
   BUNDLE_PATH: "vendor/bundle"
@@ -45,15 +44,3 @@ build:
   only:
     - main
     - tags
-
-deploy:
-  stage: deploy
-  script:
-    - mkdir -p ~/.gem
-    - echo ":rubygems_api_key: ${RUBYGEMS_API_KEY}" > ~/.gem/credentials
-    - chmod 0600 ~/.gem/credentials
-    - gem build telegem.gemspec
-    - gem push telegem-*.gem
-  only:
-    - tags
-  when: manual
