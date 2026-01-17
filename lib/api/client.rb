@@ -30,43 +30,31 @@ module Telegem
         def call(method, params = {}) 
           url = "#{BASE_URL}/bot#{@token}/#{method}"
           @logger.debug("Api call #{method}") if @logger 
-          response = @http.post(url, json: params.compact).await
-          response.json 
+          response = @http.post(url, json: params.compact)
+          json = response.json 
+          if json && json['ok'] 
+            json['result'] 
+          else 
+            raise APIError.new(json ? json['description']: "Api Error")
+           end  
          end  
         def call!(method, params = {}, &callback)
   url = "#{BASE_URL}/bot#{@token}/#{method}"
   
-     session = HTTPX.plugin(:callbacks).with(
-       timeout: { 
-      request_timeout: 30,
-      connect_timeout: 10,
-      write_timeout: 10,
-      read_timeout: 30
-     },
-     headers: {
-      'Content-Type' => 'application/json',
-      'User-Agent' => "Telegem/#{Telegem::VERSION}"
-    }
-  )
-  
-  # Set up the callbacks BEFORE making the request
   if callback
-    session.on_response_completed do |request, response|
+    @http.on_response_completed do |request, response|
       begin
         if response.status == 200
           json = response.json
           if json && json['ok']
-            # Success: callback with result
             callback.call(json['result'], nil)
             @logger.debug("API Response: #{json}") if @logger
           else
-            # API error (non-200 OK)
             error_msg = json ? json['description'] : "No JSON response"
             error_code = json['error_code'] if json
             callback.call(nil, APIError.new("API Error: #{error_msg}", error_code))
           end
         else
-          # HTTP error
           callback.call(nil, NetworkError.new("HTTP #{response.status}"))
         end
       rescue JSON::ParserError
@@ -76,17 +64,13 @@ module Telegem
       end
     end
     
-    session.on_request_error do |request, error|
-      # Network/connection errors
+    @http.on_request_error do |request, error|
       callback.call(nil, error)
     end
   end
+
+  @http.post(url, json: params.compact)
   
-  # Make the request and return immediately (async)
-  session.post(url, json: params.compact)
-  
-  # Return the session if needed (optional)
-  # session
 end
       def upload(method, params)
         url = "#{BASE_URL}/bot#{@token}/#{method}"
