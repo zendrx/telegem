@@ -3,7 +3,7 @@ require 'logger'
 require 'json'
 
 module Telegem
-  VERSION = "3.0.5".freeze 
+  VERSION = "3.1.0".freeze 
 end
 
 # Load core components
@@ -17,6 +17,8 @@ require_relative 'session/middleware'
 require_relative 'session/memory_store'
 require_relative 'markup/keyboard'
 # Webhook is loaded lazily when needed
+require_relative 'plugins/file_extract'
+require_relative 'session/scene_middleware'
 
 module Telegem
   # Main entry point: Telegem.new(token)
