@@ -321,7 +321,37 @@ module Telegem
       def uploading_document(**options)
         send_chat_action('upload_document', **options)
       end
-      
+      def ask(question, **options)
+        scene_data = session[:telegem_scene]
+        if scene_data
+          scene_data[:waiting_for_response] = true 
+          scene_data[:last_question] = question
+        end 
+        reply(question, **options) 
+      end 
+      def scene_data 
+        @session[:telegem_scene]&.[](:data] || {} 
+      end 
+      def current_scene
+        @session[:telegem_scene]&.[](:id)
+      end 
+      def in_scene?
+        !current_scene.nil?
+      end 
+      def leave_scene 
+        scene_data = @session[:telegem_scene] 
+        return unless scene_data 
+        scene_id = scene_data[:id].to_sym 
+        scene = @bot.scenes[scene_id] 
+        scene&.leave(self, options[:reason] || :manual) 
+      end 
+      def next_step(step_name = nil)
+        scene_data = @session[:telegem_scene]
+        return unless scene_data
+        scene_id = scene_data[:id].to_sym 
+        scene = @bot.scenes[scene_id] 
+        scene&.next_step(self, step_name) 
+       end 
       def with_typing(&block)
         typing_request = typing
         
@@ -343,18 +373,6 @@ module Telegem
         
         @scene = scene_name
         @bot.scenes[scene_name].enter(self, **options)
-      end
-      
-      def leave_scene(**options)
-        return nil unless @scene && @bot.scenes[@scene]
-        
-        scene_name = @scene
-        @scene = nil
-        @bot.scenes[scene_name].leave(self, **options)
-      end
-      
-      def current_scene
-        @bot.scenes[@scene] if @scene
       end
       
       def logger
