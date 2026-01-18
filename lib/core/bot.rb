@@ -255,7 +255,7 @@ end
         if update.message&.text && @logger
          user = update.message.from
          cmd = update.message.text.split.first
-         @logger.info("#{cmd} - #{user.username || user.first_name}")
+         @logger.info("#{cmd} - #{user.username}")
         end
   
           ctx = Context.new(update, self)
