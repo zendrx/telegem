@@ -16,6 +16,7 @@ cache:
 
 before_script:
   - ruby --version
+  - gem install httpx concurrent-ruby async
   - gem install bundler
   - bundle install
 
