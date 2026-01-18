@@ -321,6 +321,9 @@ module Telegem
       def uploading_document(**options)
         send_chat_action('upload_document', **options)
       end
+      def scene 
+        session[:telegem_scene]&.[](:id)
+      end 
       def ask(question, **options)
         scene_data = session[:telegem_scene]
         if scene_data
@@ -343,7 +346,10 @@ module Telegem
         return unless scene_data 
         scene_id = scene_data[:id].to_sym 
         scene = @bot.scenes[scene_id] 
-        scene&.leave(self, options[:reason] || :manual) 
+        result = scene&.leave(self, options[:reason] || :manual) 
+        @session.delete(:telegem_scene)
+        @scene = nil 
+        result
       end 
       def next_step(step_name = nil)
         scene_data = @session[:telegem_scene]
@@ -369,11 +375,12 @@ module Telegem
       end
       
       def enter_scene(scene_name, **options)
-        return nil unless @bot.scenes[scene_name]
-        
-        @scene = scene_name
-        @bot.scenes[scene_name].enter(self, **options)
-      end
+        scene = @bot.scenes[scene_name]
+        return nil unless scene
+        leave_scene if in_scene?
+        scene.enter(self, options[:step], options.except(:step))
+         scene_name
+      end 
       
       def logger
         @bot.logger
