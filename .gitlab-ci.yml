@@ -16,14 +16,12 @@ cache:
 
 before_script:
   - ruby --version
-  - gem install httpx concurrent-ruby async
-  - gem install bundler
-  - bundle install
+  - gem install httpx concurrent-ruby async rspec
 
 test:
   stage: test
   script:
-    - bundle exec rspec test/spec.rb --require test/spec_helper.rb
+    - rspec test/spec.rb --require test/spec_helper.rb
 
 build:
   stage: build
