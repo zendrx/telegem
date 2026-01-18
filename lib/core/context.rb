@@ -330,7 +330,7 @@ module Telegem
         reply(question, **options) 
       end 
       def scene_data 
-        @session[:telegem_scene]&.[](:data] || {} 
+        @session[:telegem_scene]&.[](:data) || {} 
       end 
       def current_scene
         @session[:telegem_scene]&.[](:id)
@@ -338,7 +338,7 @@ module Telegem
       def in_scene?
         !current_scene.nil?
       end 
-      def leave_scene 
+      def leave_scene(**options)
         scene_data = @session[:telegem_scene] 
         return unless scene_data 
         scene_id = scene_data[:id].to_sym 
