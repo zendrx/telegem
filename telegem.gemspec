@@ -32,15 +32,13 @@ Gem::Specification.new do |spec|
   # Dependencies
   spec.add_dependency "httpx", "~> 1.7.0"
   spec.add_dependency "concurrent-ruby", "~> 1.2"
-  spec.add_dependency "rack", ">= 2.0", "< 4.0"
-  spec.add_dependency "puma", ">= 5.0", "< 7.0"
   spec.add_dependency "async", "~> 2.1"
+  spec.add_dependency "pdf-reader"
+  spec.add_dependency "docx"
+  spec.add_dependency "open-uri"
   
-  # Development
-  spec.add_development_dependency "rake", "~> 13.0"
+  # Developmen
   spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
-  spec.add_development_dependency "webmock", "~> 3.18"
   spec.add_development_dependency "rubocop", "~> 1.50"
   
   # Metadata
