@@ -1,6 +1,16 @@
 Telegem Changelog
 
-v3.1.0 (Current)
+v3.1.1 (current)
+
+🚀 New Features
+
+· FileExtractor Plugin: New plugin for extracting content from various file types (PDF, JSON, HTML, TXT)
+· Async File Download: Added download method to API client for downloading Telegram files
+· Context File Helpers: Added download_file, download_photo, download_document methods to Context
+· Extended File Support: Plugin supports PDF text extraction, JSON parsing, HTML/raw text processing
+· Async/Sync Dual Mode: All file operations available in both sync (download) and async (download!) modes
+
+v3.1.0 
 
 · BREAKING: Rewrote polling system to prevent duplicate messages
 · Fixed thread deadlock in async polling loop
@@ -83,5 +93,3 @@ v0.1.0 (Initial Release)
 · Support for basic message types
 
 ---
-
-Note: Actual version history may vary. This changelog represents typical progression of a Telegram bot framework from MVP to production-ready system.
