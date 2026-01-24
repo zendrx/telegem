@@ -1,6 +1,5 @@
 require 'httpx'
 require 'json'
-require 'httpx/plugins/form_data'
 
 module Telegem
   module API
@@ -15,7 +14,7 @@ module Telegem
         @logger = options[:logger] || Logger.new($stdout)
         timeout = options[:timeout] || 30
         
-        @http = HTTPX.plugin(:callbacks).with(
+        @http = HTTPX.plugin(:callbacks, :form_data).with(
           timeout: { 
             request_timeout: timeout,
             connect_timeout: 10,
