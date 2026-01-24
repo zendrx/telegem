@@ -55,7 +55,6 @@ module Telegem
                         error_code = json['error_code'] if json 
                         callback.call(nil, APIError.new("API ERROR  #{error_msg}", error_code))
                       end 
-                    end 
                   else
                     callback.call(nil, NetworkError.new("HTTP #{response.status}")) 
                   end 
@@ -65,7 +64,6 @@ module Telegem
                   callback.call(nil, e)
                 end 
               end 
-              
             end 
                    
       def upload(method, params)
