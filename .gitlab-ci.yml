@@ -1,0 +1,8 @@
+image: ruby:3.3.8-apline
+before_script:
+    - gem install pdf-reader rspec 
+
+test: 
+    script:
+        - rspec test/spec.rb
+  
