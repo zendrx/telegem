@@ -1,8 +1,8 @@
-# spec/core/context_spec.rb
-require 'spec_helper'
+
+require_relative 'spec_helper'
 
 RSpec.describe Telegem::Core::Context do
-  # Mock objects to isolate the test
+  
   let(:mock_bot) { instance_double(Telegem::Core::Bot) }
   let(:mock_api) { instance_double(Telegem::API::Client) }
   
