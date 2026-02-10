@@ -30,11 +30,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   
   # Dependencies
-  spec.add_dependency "httpx"
-  spec.add_dependency "concurrent-ruby"
-  spec.add_dependency "async"
-  spec.add_dependency "pdf-reader"
-  spec.add_dependency "docx"
+  spec.add_dependency "httpx", "~> 1.0"
+  spec.add_dependency "concurrent-ruby", "~> 1.0"
+  spec.add_dependency "securerandom", "~> 0.1"
+  spec.add_dependency "async", "~> 1.0"
+  spec.add_dependency "async-http", "~> 0.100"
+  spec.add_dependency "pdf-reader", "~> 2.0"
+  spec.add_dependency "docx", "~> 0.3"
   
   # Developmen
   spec.add_development_dependency "rspec", "~> 3.12"
@@ -42,7 +44,7 @@ Gem::Specification.new do |spec|
   
   # Metadata
   spec.metadata = {
-    "homepage_uri" => spec.homepage,
+    "homepage_uri" => "#{spec.homepage}/-/blob/main/README.md" ,
     "source_code_uri" => spec.homepage,
     "changelog_uri" => "#{spec.homepage}/-/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{spec.homepage}/-/issues",
