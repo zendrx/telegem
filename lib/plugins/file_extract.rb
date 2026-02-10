@@ -1,82 +1,207 @@
-require 'json'
+#frozen_string_literal: true
 require 'pdf/reader'
-
+require 'json'
+require 'tempfile'
 module Telegem
   module Plugins
-    class FileExtractor
+    class FileExtract
       def initialize(bot, file_id, **options)
         @bot = bot
         @file_id = file_id
         @options = {
-          timeout: 15,
           auto_delete: true,
-          file_type: nil
+          max_file_size: 50 * 1024 * 1024,
+          timeout: 60
         }.merge(options)
-        @file_path = "temp/#{@file_id}"
+      @temp_file = nil
+      @detected_type = nil
+      end 
+      def extract
+        download_if_needed
+        detect_type
+        case @detected_type
+        when :pdf then extract_pdf
+        when :json then extract_json
+        when :html then extract_html
+        when :txt, :md, :csv then extract_text
+        else 
+          {
+            success: false,
+            error: "Unsupported file type: #{@detected_type}"
+          }
+        end 
+      end 
+      private 
+      def download_if_needed
+        return if @temp_file
+        @temp_file = Tempfile.new(['telegem_', SecureRandom.hex(6)])
+        unless 
+          @bot.api.download(@file_id, @temp_file.path)
+          raise "Failed to download file with ID #{@file_id}"
+        end
+        @temp_file.close
       end
-
-
-      def extract_pdf(@file_path)
-        begin
-          @bot.api.download(@file_id, "#{file_path}.pdf")
-          reader = PDF::Reader.new("#{file_path}.pdf")
-          text = reader.pages.map(&:text).join("\n").strip
-
-          if text.empty?
-            { error: "pdf is empty" }
-          else
-            result = {
-              success: true,
-              content: text,
-              pages: reader.page_count,
+      def detect_type
+        return @detected_type if @detected_type
+        pll = File.read(@temp_file.path, 10) rescue nil
+        case pll
+        when "%PDF" then @detected_type = :pdf
+        when "{", "[" then @detected_type = :json
+        when "<!DO", "<ht" then @detected_type = :html
+        else 
+          ext = File.extname(@temp_file.path).downcase
+          @detected_type = case ext
+                           when ".txt" then :txt
+                           when ".md" then :md
+                           when ".csv" then :csv
+                           else :unknown
+                           end
+        end
+        @detected_type
+      end
+      def extract_pdf
+        begin 
+          reader = PDF::Reader.new(@temp_file.path)
+          text = reader.pages.map(&:text).join("\n")
+          if text.strip.empty?
+            return {
+              success: false,
+              error: "PDF contains no extractable text"
             }
-            File.delete("#{file_path}.pdf") if @options[:auto_delete]
-            result
-          end
-        rescue PDF::Reader::MalformedPDFError
-          { error: "malformed pdf format" }
-        rescue PDF::Reader::EncryptedPDFError
-          { error: "encrypted pdf" }
+          end 
+          {
+            success: true,
+            type: :pdf,
+            content: text,
+            metadata: {
+              page_count: reader.page_count,
+              info: reader.info
+            }
+          }
         rescue => e
-          { error: "pdf processing failed #{e.message}" }
-        ensure
-          File.delete("#{file_path}.pdf") if @options[:auto_delete] && File.exist?("#{file_path}.pdf")
+          {
+            success: false,
+            error: "Failed to extract PDF: #{e.message}"
+          }
+          rescue LoadError
+            {
+              success: false,
+              error: "PDF extraction requires the 'pdf-reader' gem. Please add it to your Gemfile."
+            } 
+            rescue PDF::Reader::MalformedPDFError => e
+              {
+                success: false,
+                error: "Malformed PDF: #{e.message}"
+              } 
+            rescue PDF::Reader::UnsupportedFeatureError => e
+              {
+                success: false,
+                error: "Unsupported PDF feature: #{e.message}"
+              } 
+            rescue PDF::Reader::EncryptedPDFError => e
+              {
+                success: false,
+                error: "Encrypted PDF: #{e.message}"
+              } 
+            ensure 
+              cleanup if @options[:auto_delete]   
         end
       end
-
-      def extract_json(@file_path)
-        @bot.api.download(@file_id, "#{file_path}.json")
-        json_data = JSON.parse(File.read("#{file_path}.json"))
-        if File.exist?("#{file_path}.json")
+      def extract_json
+        begin 
+          content = File.read(@temp_file.path)
+          data = JSON.parse(content)
+          if data.nil? || (data.is_a?(Hash) && data.empty?) || (data.is_a?(Array) && data.empty?)
+            return {
+              success: false,
+              error: "JSON file is empty or contains no data"
+            }
           {
             success: true,
-            content: json_data
+            type: :json,
+            content: data,
+            metadata: {
+              size: content.size,
+              keys: data.is_a?(Hash) ? data.keys : nil,
+              length: data.is_a?(Array) ? data.length : nil  
           }
-        else
+        } 
+        rescue => e
           {
-            error: "no json file"
+            success: false,
+            error: "Failed to extract JSON: #{e.message}"
           }
+          rescue LoadError
+            {
+              success: false,
+              error: "JSON extraction requires the 'json' gem. Please add it to your Gemfile."
+            }
+          rescue JSON::ParserError => e
+            {
+              success: false,
+              error: "Invalid JSON format: #{e.message}"
+            } 
+          ensure 
+            cleanup if @options[:auto_delete]   
         end
       end
-
-      def extract_html(@file_path)
-        destination = "#{file_path}.html"
-        @bot.api.download(@file_id, destination)
-        html = File.read(destination)
-        if html.empty?
-          {
-            error: "html content is empty"
-          }
-        else
+      def extract_html
+        begin 
+          content = File.read(@temp_file.path)
+          if content.strip.empty?
+            return {
+              success: false,
+              error: "HTML file is empty"
+            }
+          end
           {
             success: true,
-            content: html
+            type: :html,
+            content: content,
+            metadata: {
+              size: content.size,
+              title: content[/<title>(.*?)<\/title>/i, 1]
+            }
           }
+        rescue => e
+          {
+            success: false,
+            error: "Failed to extract HTML: #{e.message}"
+          }
+          ensure 
+            cleanup if @options[:auto_delete]   
         end
-      rescue => e
-        {
-          error: "error #{e.message}"
-        }
+      end
+      def extract_text
+        begin 
+          content = File.read(@temp_file.path)
+          if content.strip.empty?
+            return {
+              success: false,
+              error: "Text file is empty"
+            }
+          end
+          {
+            success: true,
+            type: :text,
+            content: content,
+            metadata: {
+              size: content.size,
+              line_count: content.lines.count
+            }
+          }
+        rescue => e
+          {
+            success: false,
+            error: "Failed to extract text: #{e.message}"
+          }
+          ensure 
+            cleanup if @options[:auto_delete]   
+        end
+      end
+      def cleanup
+        @temp_file.unlink if @temp_file
+        @temp_file = nil
       end
     end
   end
