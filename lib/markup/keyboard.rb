@@ -27,14 +27,19 @@ module Telegem
         self
       end
 
-      def button(text, **options)
-        if @buttons.empty? || !@buttons.last.is_a?(Array)
-          @buttons << [{ text: text }.merge(options)]
-        else
-          @buttons.last << { text: text }.merge(options)
-        end
-        self
-      end
+      def button(text, style: nil, icon_custom_emoji_id: nil, **options)
+        btn = {
+          text: text
+      }.merge(options)
+      btn[:style] = style if style 
+      btn[:icon_custom_emoji_id] = icon_custom_emoji_id if icon_custom_emoji_id
+      if @buttons.empty? || @buttons.last.is_a?(Array)
+        @buttons << [btn]
+      else 
+        @buttons.last << btn
+      end 
+      self 
+    end 
 
       def request_contact(text)
         button(text, request_contact: true)
@@ -114,14 +119,19 @@ module Telegem
         self
       end
 
-      def button(text, **options)
-        if @buttons.empty? || !@buttons.last.is_a?(Array)
-          @buttons << [{ text: text }.merge(options)]
-        else
-          @buttons.last << { text: text }.merge(options)
-        end
-        self
-      end
+     def button(text, style: nil, icon_custom_emoji_id: nil, **options)
+        btn = {
+          text: text
+      }.merge(options)
+      btn[:style] = style if style 
+      btn[:icon_custom_emoji_id] = icon_custom_emoji_id if icon_custom_emoji_id
+      if @buttons.empty? || @buttons.last.is_a?(Array)
+        @buttons << [btn]
+      else 
+        @buttons.last << btn
+      end 
+      self 
+    end 
 
       def url(text, url)
         button(text, url: url)
@@ -158,6 +168,7 @@ module Telegem
         end.compact 
          { inline_keyboard: clean_rows} 
       end 
+   
       def to_json(*args)
         to_h.to_json(*args)
       end
