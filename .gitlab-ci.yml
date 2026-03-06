@@ -1,7 +1,7 @@
 
 image: ruby:3.3.8
 before_script:
-- gem install async pdf-reader rspec httpx concurrent-ruby async-http telegem
+- gem install async pdf-reader rspec httpx concurrent-ruby async-http telegem rubocop
 test:
   script:
   - rspec test/spec.rb
