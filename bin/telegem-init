@@ -3,25 +3,30 @@
 
 require 'fileutils'
 
-puts "creating a telegem application..."
+puts " Creating a telegem application..."
 
+# Create the nested directory structure
 FileUtils.mkdir_p("src/handlers")
+
 
 code = <<~RUBY
   require 'telegem'
-  require './handlers/*'
   require 'dotenv/load'
+  
+  # Load all handlers from the handlers directory relative to this file
+  Dir[File.join(__dir__, 'handlers', '*.rb')].each { |file| require file }
 
   bot = Telegem.new(ENV['BOT_TOKEN'])
 
+  puts "Bot is starting..."
   bot.start_polling
 RUBY
 
 File.write('src/bot.rb', code)
 
-puts "Successfully created bot.rb!"
+# Optional: Create a blank .env file so the bot doesn't crash on load
+File.write('.env', "BOT_TOKEN=your_token_here") unless File.exist?('.env')
 
-puts "done working.."
-
-
-
+puts "Successfully created src/bot.rb"
+puts " Structure created: src/handlers/"
+puts " Done working. Run your bot with: ruby src/bot.rb"
