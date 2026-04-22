@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
     and a clean DSL. Perfect for building scalable Telegram bots.
   DESC
   
-  spec.homepage      = "https://gitlab.com/ruby-telegem/telegem"
+  spec.homepage      = "https://github.com/slick-lab/telegem"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
   
