@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   end
   
   spec.bindir        = "bin"
-  spec.executables   = ["telegem-ssl"]
+  spec.executables   = ["telegem-ssl", "telegem-init"]
   spec.require_paths = ["lib"]
   
   # Dependencies
