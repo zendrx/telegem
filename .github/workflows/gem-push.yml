@@ -43,7 +43,11 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.4.9
-
+        
+    - name: gem install
+     run: |
+       gem install
+     
     - name: Publish to GPR (GitHub Packages)
       if: steps.check_version.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
       run: |
