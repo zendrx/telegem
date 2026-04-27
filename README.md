@@ -2,6 +2,8 @@
 
 Welcome to the comprehensive documentation for Telegem, a modern Ruby framework for building Telegram bots.
 
+[![Gem Version](https://badge.fury.io/rb/telegem.svg)](https://badge.fury.io/rb/telegem)
+
 ## Table of Contents
 
 ### Getting Started
