@@ -1,4 +1,4 @@
-# lib/core/composer.rb - HTTPX VERSION (NO ASYNC GEM)
+# lib/core/composer.rb 
 module Telegem
   module Core
     class Composer
