@@ -50,7 +50,7 @@ module Telegem
 
   def self.webhook(bot, **options)
     require_relative 'webhook/server'
-    Webhook::Server.setup(bot, **options)
+    Webhook::Server.new(bot, **options)
   end
   
   def self.info
@@ -68,7 +68,7 @@ module Telegem
       • Fluent keyboard DSL
       • Cloud-ready webhook server
       
-      Website: https://gitlab.com/ruby-telegem/telegem
+      Website: https://github.com/slick-lab/telegem
     INFO
   end
 end
